@@ -1,0 +1,26 @@
+Anforderungen an Projektarbeit:
+- Ajax request einbauen
+- Teil der Webseite mit js bauen
+- Benutzerereignisse
+- Wiederholung und Festigung des Gelernten
+- jQuery erlaubt
+
+z.B. Webseite mit Spielchen:
+- Lotto
+- Benutzer muß Fragen beantworten, wird mit Punkten bewertet.
+
+Projektarbeit
+Abgabe Freitag:
+- Code hochladen auf den Datenaustausch, eigener Ordner
+- Präsentation kurz halten:
+  - Ergebnisse zeigen incl. Code
+  - kurz beschreiben, was ihr gemacht habt, wo es Schwierigkeiten gab und welche Lernerfahrungen ihr hattet.
+
+https://github.com/mozilla/activity-stream
+
+Firefox Quantum 59.0.2
+
+TODO:
+- Menu unterhalb der Pages einbauen
+- Undo/Redo
+- gesamten Code für den PagesContainer kapseln, so dass er mehrfach instanziiert werden kann, um z.B. mehrere PagesContainer auf der Startseite zu haben.

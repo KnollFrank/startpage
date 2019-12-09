@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Startseite</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/popupmenu.css">
+    <link rel="stylesheet" href="styles/thumbnail.css">
+    <link rel="stylesheet" href="styles/dragAndDrop.css">
+    <link rel="stylesheet" href="styles/slideToggle.css">
+    <script src="js/jquery-3.4.1.js"></script>
+    <script src="js/dom_helper.js" defer></script>
+    <link rel="stylesheet" href="js/jquery-ui-1.12.1/jquery-ui.min.css">
+    <script src="js/jquery-ui-1.12.1/jquery-ui.js"></script>
+    <script src="js/popupmenu.js" defer></script>
+    <script src="js/dragAndDrop.js" defer></script>
+    <script src="js/idGenerator.js" defer></script>
+    <script src="js/pageTemplate.js" defer></script>
+    <script src="js/application.js" defer></script>
+    <script src="js/storage.js" defer></script>
+    <script src="js/model.js" defer></script>
+    <script src="js/pageDialog.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/init.js" defer></script>
+    <script src="js/slideToggle.js" defer></script>
+</head>
+
+<body>
+    <div id="pageDialog" class="dialog">
+        <form>
+            <ul>
+                <li class="row">
+                    <div class="col-25">
+                        <label for="pageTitle">Titel</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="text" name="title" id="pageTitle" placeholder="Name eingeben">
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="col-25">
+                        <label for="pageUrl">Adresse</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="url" name="url" id="pageUrl" placeholder="Eine Adresse eingeben oder einfügen">
+                    </div>
+                </li>
+            </ul>
+        </form>
+        <div class="preview">
+            <div class="page">
+                <figure class="relative">
+                    <div class="thumbnail-container">
+                        <div class="thumbnail">
+                            <iframe src="" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                    <figcaption></figcaption>
+                    <div class="dropdown">
+                        <button class="dropbtn">...</button>
+                    </div>
+                </figure>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <form action="https://www.google.com/search" target="_blank" class="inputwrapper">
+            <input type="search" name="q" placeholder="Das Web durchsuchen">
+            <input type="submit" value="&rarr;" />
+        </form>
+        <article>
+            <h2 class="option-heading is-active">Meine Seiten</h2>
+            <div class="option-content">
+                <div id="overallDropdown" class="dropdown">
+                    <button onclick="toggleDropdownContent('overallDropdownContent')" class="dropbtn">...</button>
+                    <div id="overallDropdownContent" class="dropdown-content">
+                        <a id="addPageCmd" href="#addPage">
+                            <span class="icon icon-spacer icon-add"></span>
+                            Seite hinzufügen
+                        </a>
+                    </div>
+                </div>
+                <div id="pagesContainer"></div>
+            </div>
+        </article>
+    </main>
+</body>
+
+</html>

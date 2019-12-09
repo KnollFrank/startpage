@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>QUnit-Tests</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/popupmenu.css">
+    <link rel="stylesheet" href="styles/thumbnail.css">
+    <link rel="stylesheet" href="styles/dragAndDrop.css">
+    <link rel="stylesheet" href="styles/slideToggle.css">
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.9.2.css">
+    <script src="js/jquery-3.4.1.js"></script>
+    <script src="js/dom_helper.js" defer></script>
+    <link rel="stylesheet" href="js/jquery-ui-1.12.1/jquery-ui.min.css">
+    <script src="js/jquery-ui-1.12.1/jquery-ui.js"></script>
+    <script src="js/popupmenu.js" defer></script>
+    <script src="js/dragAndDrop.js" defer></script>
+    <script src="js/idGenerator.js" defer></script>
+    <script src="js/pageTemplate.js" defer></script>
+    <script src="js/application.js" defer></script>
+    <script src="js/storage.js" defer></script>
+    <script src="js/model.js" defer></script>
+    <script src="js/pageDialog.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/slideToggle.js" defer></script>
+</head>
+
+<body>
+    <div id="pageDialog" class="dialog">
+        <form>
+            <ul>
+                <li class="row">
+                    <div class="col-25">
+                        <label for="pageTitle">Titel</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="text" name="title" id="pageTitle" placeholder="Name eingeben">
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="col-25">
+                        <label for="pageUrl">Adresse</label>
+                    </div>
+                    <div class="col-75">
+                        <input type="url" name="url" id="pageUrl" placeholder="Eine Adresse eingeben oder einfügen">
+                    </div>
+                </li>
+            </ul>
+        </form>
+        <div class="preview">
+            <div class="page">
+                <figure class="relative">
+                    <div class="thumbnail-container">
+                        <div class="thumbnail">
+                            <iframe src="" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                    <figcaption></figcaption>
+                    <div class="dropdown">
+                        <button class="dropbtn">...</button>
+                    </div>
+                </figure>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <form action="https://www.google.com/search" target="_blank" class="inputwrapper">
+            <input type="search" name="q" placeholder="Das Web durchsuchen">
+            <input type="submit" value="&rarr;" />
+        </form>
+        <article>
+            <h2 class="option-heading is-active">Meine Seiten</h2>
+            <div class="option-content">
+                <div id="overallDropdown" class="dropdown">
+                    <button onclick="toggleDropdownContent('overallDropdownContent')" class="dropbtn">...</button>
+                    <div id="overallDropdownContent" class="dropdown-content">
+                            <a id="addPageCmd" href="#addPage">
+                                <span class="icon icon-spacer icon-add"></span>
+                                Seite hinzufügen
+                            </a>
+                        </div>
+                    </div>
+                <div id="pagesContainer"></div>
+            </div>
+        </article>
+    </main>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="https://code.jquery.com/qunit/qunit-2.9.2.js"></script>
+    <script>
+        QUnit.test('test modelAsJson', function (assert) {
+            // GIVEN
+            const storage = new StorageInMemory();
+            const application = new Application(storage);
+            application.model.addPage(createPage(application.model, 'Tagesschau',
+                'https://www.tagesschau.de/'));
+            application.model.addPage(createPage(application.model, 'ZDF', 'https://www.zdf.de/'));
+            application.model.addPage(createPage(application.model, 'DKMS', 'https://www.dkms.de/de'));
+
+            let jsonExpected = {
+                pages: [{
+                    title: 'Tagesschau',
+                    url: 'https://www.tagesschau.de/'
+                }, {
+                    title: 'ZDF',
+                    url: 'https://www.zdf.de/'
+                }, {
+                    title: 'DKMS',
+                    url: 'https://www.dkms.de/de'
+                }]
+            };
+
+            // WHEN
+            let jsonActual = application.model.asJson();
+
+            // THEN
+            assert.deepEqual(jsonActual, jsonExpected);
+        });
+
+        QUnit.test('test jsonAsModel', function (assert) {
+            // GIVEN
+            let title = 'Tagesschau';
+            let url = 'https://www.tagesschau.de/';
+            let json = {
+                pages: [{
+                    title: title,
+                    url: url
+                }]
+            };
+
+            // WHEN
+            let model = jsonAsModel(json);
+
+            // THEN
+            assert.equal(model.ul.$$FK('li').length, 1, "one page");
+            let li = model.ul.$$FK('li')[0];
+            assert.equal(li.$FK('a').getAttribute('href'), url, "url in a attribute");
+            assert.equal(li.$FK('.openPage').getAttribute('href'), url, "url in openPage");
+            assert.equal(li.$FK('iframe').getAttribute('src'), url, "url in iframe");
+            assert.equal(li.$FK('figcaption').textContent, title, "title in figcaption");
+        });
+
+        QUnit.test('load/save pages from/to local storage', function (assert) {
+            // GIVEN
+            const storage = new StorageLocal();
+            const pages = {
+                pages: [{
+                    title: 'Tagesschau',
+                    url: 'https://www.tagesschau.de/'
+                }, {
+                    title: 'ZDF',
+                    url: 'https://www.zdf.de/'
+                }, {
+                    title: 'DKMS',
+                    url: 'https://www.dkms.de/de'
+                }]
+            };
+
+            // WHEN
+            storage.save(pages);
+            const pagesLoaded = storage.load();
+
+            // THEN
+            assert.deepEqual(pagesLoaded, pages, 'saved pages equals loaded pages');
+        });
+
+        QUnit.test('application creates empty model when it does not exist yet', function (assert) {
+            // GIVEN empty storage            
+            const storage = new StorageInMemory();
+
+            // WHEN
+            const application = new Application(storage);
+
+            // THEN
+            const emptyModel = {
+                pages: []
+            };
+            assert.deepEqual(application.model.asJson(), emptyModel, 'empty model is created');
+            assert.deepEqual(storage.load(), emptyModel, 'empty model is created within local storage');
+        });
+
+        QUnit.test('application loads saved model', function (assert) {
+            // GIVEN a saved moded
+            const storage = new StorageInMemory();
+            const pages = {
+                pages: [{
+                    title: 'Tagesschau',
+                    url: 'https://www.tagesschau.de/'
+                }]
+            };
+            storage.save(pages);
+
+            // WHEN
+            const application = new Application(storage);
+
+            // THEN
+            assert.deepEqual(application.model.asJson(), pages, 'loaded model equals saved model');
+        });
+
+        QUnit.test('added page is saved to storage', function (assert) {
+            const storage = new StorageInMemory();
+            application = new Application(storage);
+            const title = 'Tagesschau';
+            const url = 'https://www.tagesschau.de/';
+
+            // WHEN
+            addPageToModelAndSave(application.model, title, url);
+
+            // THEN
+            const pagesExpected = {
+                pages: [{
+                    title: title,
+                    url: url
+                }]
+            };
+            assert.deepEqual(storage.load(), pagesExpected, 'added page is saved to storage');
+        });
+
+        QUnit.test('edited page is saved to storage', function (assert) {
+            const storage = new StorageInMemory();
+            application = new Application(storage);
+            const newTitle = 'phoenix';
+            const newUrl = 'https://www.phoenix.de/';
+            addPageToModelAndSave(application.model, 'Tagesschau', 'https://www.tagesschau.de/');
+
+            // WHEN
+            editPageAndSave(application.model.getPages()[0], newTitle, newUrl);
+
+            // THEN
+            assert.equal(storage.load().pages[0].title, newTitle, 'edited title is saved to storage');
+            assert.equal(storage.load().pages[0].url, newUrl, 'edited url is saved to storage');
+        });
+    </script>
+</body>
+
+</html>

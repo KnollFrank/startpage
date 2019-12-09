@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+.option-heading:after {
+    /* > arrow */
+    content: "\2bc8";
+}
+
+.option-heading.is-active:after {
+    /* v arrow */
+    content: "\2bc6";
+}
